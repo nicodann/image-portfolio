@@ -13,28 +13,25 @@ export default function AdminPage() {
     function init() {
       const ni = window.netlifyIdentity;
       ni.init();
-
-      const current = ni.currentUser();
-      setUser(current ?? null);
+      setUser(ni.currentUser() ?? null);
       setReady(true);
-
-      ni.on("login", (u) => {
-        setUser(u ?? null);
-        ni.close();
-      });
+      ni.on("login", (u) => { setUser(u ?? null); ni.close(); });
       ni.on("logout", () => setUser(null));
     }
 
     if (window.netlifyIdentity) {
       init();
-    } else {
-      // Widget loads asynchronously — wait for it
-      const script = document.querySelector(
-        'script[src*="netlify-identity-widget"]',
-      );
-      script?.addEventListener("load", init);
-      return () => script?.removeEventListener("load", init);
+      return;
     }
+
+    const interval = setInterval(() => {
+      if (window.netlifyIdentity) {
+        clearInterval(interval);
+        init();
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
   }, []);
 
   function getToken(): string | null {
