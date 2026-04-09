@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import UploadForm from "@/components/UploadForm";
+import MasonryGrid from "@/components/MasonryGrid";
 
 type User = NonNullable<ReturnType<Window["netlifyIdentity"]["currentUser"]>>;
 
@@ -15,7 +16,10 @@ export default function AdminPage() {
       ni.init();
       setUser(ni.currentUser() ?? null);
       setReady(true);
-      ni.on("login", (u) => { setUser(u ?? null); ni.close(); });
+      ni.on("login", (u) => {
+        setUser(u ?? null);
+        ni.close();
+      });
       ni.on("logout", () => setUser(null));
     }
 

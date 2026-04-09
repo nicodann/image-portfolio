@@ -1,25 +1,26 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Image from 'next/image'
-import type { Artwork } from '@/app/page'
-import Lightbox from './Lightbox'
+import { useState } from "react";
+import Image from "next/image";
+// import type { Artwork } from '@/app/page'
+import Lightbox from "./Lightbox";
+import { Artwork } from "@/types/artwork";
 
-export default function MasonryGrid({ artworks }: { artworks: Artwork[] }) {
-  const [selected, setSelected] = useState<Artwork | null>(null)
+export default function MasonryGrid({ artwork }: { artwork: Artwork[] }) {
+  const [selected, setSelected] = useState<Artwork | null>(null);
 
-  if (artworks.length === 0) {
+  if (artwork.length === 0) {
     return (
       <p className="text-center text-neutral-500 mt-24 text-sm tracking-widest uppercase">
         No works yet
       </p>
-    )
+    );
   }
 
   return (
     <>
       <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
-        {artworks.map((artwork) => (
+        {artwork.map((artwork) => (
           <button
             key={artwork.id}
             className="break-inside-avoid mb-4 w-full text-left group relative block overflow-hidden rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
@@ -49,5 +50,5 @@ export default function MasonryGrid({ artworks }: { artworks: Artwork[] }) {
         <Lightbox artwork={selected} onClose={() => setSelected(null)} />
       )}
     </>
-  )
+  );
 }
