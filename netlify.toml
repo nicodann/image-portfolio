@@ -14,3 +14,9 @@
   to = "/.netlify/functions/upload"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/api/upload-site-info"
+  to = "/.netlify/functions/upload-site-info"
+  status = 200
+  force = true

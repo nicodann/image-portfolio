@@ -5,6 +5,7 @@ import UploadForm from "@/components/UploadForm";
 import { Artwork, SiteInfo } from "@/types/types";
 import { HomeButton } from "./HomeButton";
 import GalleryUI from "./GalleryUI";
+import UploadSiteInfoForm from "./UploadSiteInfoForm";
 
 type User = NonNullable<ReturnType<Window["netlifyIdentity"]["currentUser"]>>;
 
@@ -80,6 +81,7 @@ export default function AdminUI({
     <main id="admin-main" className="px-4">
       <header className="bg-slate-800 border-b-black border-b-[1.5em] p-8">
         <h1>{siteInfo.title}</h1>
+        <UploadSiteInfoForm getToken={getToken} />
         <p>(click to edit title)</p>
         <div id="upload-form-header" className="p-8 max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-10">

@@ -1,57 +1,67 @@
-'use client'
+"use client";
 
-import { useState, useRef } from 'react'
+import { useState, useRef } from "react";
 
 interface UploadFormProps {
-  getToken: () => string | null
+  getToken: () => string | null;
 }
 
-type Status = { type: 'success' | 'error'; message: string } | null
+type Status = { type: "success" | "error"; message: string } | null;
 
 export default function UploadForm({ getToken }: UploadFormProps) {
-  const [status, setStatus] = useState<Status>(null)
-  const [loading, setLoading] = useState(false)
-  const formRef = useRef<HTMLFormElement>(null)
+  const [status, setStatus] = useState<Status>(null);
+  const [loading, setLoading] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setStatus(null)
+    e.preventDefault();
+    setStatus(null);
 
-    const token = getToken()
+    const token = getToken();
     if (!token) {
-      setStatus({ type: 'error', message: 'Not authenticated.' })
-      return
+      setStatus({ type: "error", message: "Not authenticated." });
+      return;
     }
 
-    const form = e.currentTarget
-    const data = new FormData(form)
+    const form = e.currentTarget;
+    const data = new FormData(form);
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
+      const res = await fetch("/api/upload", {
+        method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: data,
-      })
+      });
 
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.error || `Upload failed (${res.status})`)
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Upload failed (${res.status})`);
       }
 
-      setStatus({ type: 'success', message: 'Artwork uploaded successfully. The site will rebuild shortly.' })
-      formRef.current?.reset()
+      setStatus({
+        type: "success",
+        message:
+          "Artwork uploaded successfully. The site will rebuild shortly.",
+      });
+      formRef.current?.reset();
     } catch (err) {
-      setStatus({ type: 'error', message: err instanceof Error ? err.message : 'Unknown error' })
+      setStatus({
+        type: "error",
+        message: err instanceof Error ? err.message : "Unknown error",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 max-w-lg">
       <div>
-        <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-1" htmlFor="title">
+        <label
+          className="block text-xs uppercase tracking-widest text-neutral-400 mb-1"
+          htmlFor="title"
+        >
           Title
         </label>
         <input
@@ -64,7 +74,10 @@ export default function UploadForm({ getToken }: UploadFormProps) {
       </div>
 
       <div>
-        <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-1" htmlFor="year">
+        <label
+          className="block text-xs uppercase tracking-widest text-neutral-400 mb-1"
+          htmlFor="year"
+        >
           Year
         </label>
         <input
@@ -79,7 +92,10 @@ export default function UploadForm({ getToken }: UploadFormProps) {
       </div>
 
       <div>
-        <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-1" htmlFor="description">
+        <label
+          className="block text-xs uppercase tracking-widest text-neutral-400 mb-1"
+          htmlFor="description"
+        >
           Description
         </label>
         <textarea
@@ -92,7 +108,10 @@ export default function UploadForm({ getToken }: UploadFormProps) {
       </div>
 
       <div>
-        <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-1" htmlFor="image">
+        <label
+          className="block text-xs uppercase tracking-widest text-neutral-400 mb-1"
+          htmlFor="image"
+        >
           Image
         </label>
         <input
@@ -108,7 +127,7 @@ export default function UploadForm({ getToken }: UploadFormProps) {
       {status && (
         <p
           className={`text-sm ${
-            status.type === 'success' ? 'text-green-400' : 'text-red-400'
+            status.type === "success" ? "text-green-400" : "text-red-400"
           }`}
         >
           {status.message}
@@ -120,8 +139,8 @@ export default function UploadForm({ getToken }: UploadFormProps) {
         disabled={loading}
         className="px-5 py-2 bg-neutral-100 text-neutral-950 text-sm font-medium rounded-sm hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
-        {loading ? 'Uploading…' : 'Upload'}
+        {loading ? "Uploading…" : "Upload"}
       </button>
     </form>
-  )
+  );
 }
