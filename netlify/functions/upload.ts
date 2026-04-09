@@ -1,4 +1,6 @@
 import type { Handler, HandlerEvent } from '@netlify/functions'
+import { readFileSync, writeFileSync } from 'fs'
+import { join } from 'path'
 import Busboy from 'busboy'
 import sharp from 'sharp'
 import { v2 as cloudinary } from 'cloudinary'
@@ -238,6 +240,13 @@ export const handler: Handler = async (event) => {
   } catch (err) {
     console.error('GitHub error:', err)
     return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save artwork metadata' }) }
+  }
+
+  // --- In local dev, also write directly to disk so the Next.js server sees it immediately ---
+  if (process.env.NETLIFY_DEV === 'true') {
+    const localPath = join(process.cwd(), ARTWORKS_PATH)
+    const current: Artwork[] = JSON.parse(readFileSync(localPath, 'utf-8'))
+    writeFileSync(localPath, JSON.stringify([...current, artwork], null, 2) + '\n')
   }
 
   return {
