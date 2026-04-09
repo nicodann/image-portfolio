@@ -5,7 +5,7 @@ import { Artwork } from "@/types/artwork";
 
 export default function GalleryPage() {
   const raw = readFileSync(
-    join(process.cwd(), "content", "artworks.json"),
+    join(process.cwd(), "content", "artwork.json"),
     "utf-8",
   );
   const artwork: Artwork[] = JSON.parse(raw);
