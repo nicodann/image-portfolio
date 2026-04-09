@@ -12,5 +12,12 @@
     "year": 2026,
     "description": "A Bat",
     "imageUrl": "https://res.cloudinary.com/dlc0ekuez/image/upload/v1775696410/portfolio/gh942srrbd8vda5f6g3r.jpg"
+  },
+  {
+    "id": "1775734960054",
+    "title": "Hamster",
+    "year": 2026,
+    "description": "A hamster.",
+    "imageUrl": "https://res.cloudinary.com/dlc0ekuez/image/upload/v1775734959/portfolio/sdwpzunfgclbu2okhweg.jpg"
   }
 ]
