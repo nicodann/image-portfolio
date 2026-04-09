@@ -9,13 +9,7 @@ import { Artwork } from "@/types/artwork";
 
 type User = NonNullable<ReturnType<Window["netlifyIdentity"]["currentUser"]>>;
 
-const raw = readFileSync(
-  join(process.cwd(), "content", "artwork.json"),
-  "utf-8",
-);
-const artwork: Artwork[] = JSON.parse(raw);
-
-export default function AdminPage() {
+export default function AdminUI({ artwork }: { artwork: Artwork[] }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
 
