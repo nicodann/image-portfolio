@@ -4,6 +4,7 @@ import { join } from "path";
 import Busboy from "busboy";
 import sharp from "sharp";
 import { v2 as cloudinary } from "cloudinary";
+import { Artwork } from "@/types/artwork";
 
 // ---------------------------------------------------------------------------
 // Cloudinary config
@@ -24,13 +25,6 @@ const ARTWORK_PATH = "content/artwork.json";
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-interface Artwork {
-  id: string;
-  title: string;
-  year: number;
-  description: string;
-  imageUrl: string;
-}
 
 interface ParsedForm {
   fields: Record<string, string>;
@@ -111,7 +105,7 @@ function uploadToCloudinary(buffer: Buffer): Promise<string> {
 }
 
 /** Read → append → write artwork.json via the GitHub Contents API. */
-async function appendArtwork(artwork: Artwork): Promise<void> {
+async function prependArtwork(artwork: Artwork): Promise<void> {
   const token = process.env.GITHUB_TOKEN;
   const repo = process.env.GITHUB_REPO;
   const branch = process.env.GITHUB_BRANCH || "main";
@@ -137,7 +131,7 @@ async function appendArtwork(artwork: Artwork): Promise<void> {
     Buffer.from(fileData.content, "base64").toString("utf-8"),
   );
 
-  const updated = [...current, artwork];
+  const updated = [artwork, ...current];
   const newContent = Buffer.from(
     JSON.stringify(updated, null, 2) + "\n",
   ).toString("base64");
@@ -178,7 +172,9 @@ export const handler: Handler = async (event) => {
   if (!token) {
     return {
       statusCode: 401,
-      body: JSON.stringify({ error: "Missing authorization token" }),
+      body: JSON.stringify({
+        error: "User not logged in: Missing authorization token.",
+      }),
     };
   }
 
@@ -186,7 +182,9 @@ export const handler: Handler = async (event) => {
   if (!tokenValid) {
     return {
       statusCode: 401,
-      body: JSON.stringify({ error: "Invalid or expired token" }),
+      body: JSON.stringify({
+        error: "Session expired, please login again: Invalid or expired token",
+      }),
     };
   }
 
@@ -271,7 +269,7 @@ export const handler: Handler = async (event) => {
 
   // --- Commit to GitHub ---
   try {
-    await appendArtwork(artwork);
+    await prependArtwork(artwork);
   } catch (err) {
     console.error("GitHub error:", err);
     return {
@@ -286,7 +284,7 @@ export const handler: Handler = async (event) => {
     const current: Artwork[] = JSON.parse(readFileSync(localPath, "utf-8"));
     writeFileSync(
       localPath,
-      JSON.stringify([...current, artwork], null, 2) + "\n",
+      JSON.stringify([artwork, ...current], null, 2) + "\n",
     );
   }
 

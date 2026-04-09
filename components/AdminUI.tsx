@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import UploadForm from "@/components/UploadForm";
 import MasonryGrid from "@/components/MasonryGrid";
-import { readFileSync } from "fs";
-import { join } from "path";
 import { Artwork } from "@/types/artwork";
 
 type User = NonNullable<ReturnType<Window["netlifyIdentity"]["currentUser"]>>;
@@ -72,22 +70,24 @@ export default function AdminUI({ artwork }: { artwork: Artwork[] }) {
   }
 
   return (
-    <main className="min-h-screen p-8 max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-10">
-        <h1 className="text-sm uppercase tracking-widest text-neutral-400">
-          Upload artwork
-        </h1>
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-neutral-600">{user.email}</span>
-          <button
-            onClick={handleLogout}
-            className="text-xs text-neutral-500 hover:text-neutral-300 underline underline-offset-2"
-          >
-            Sign out
-          </button>
+    <main className="px-4">
+      <div id="admin" className="p-8 max-w-2xl mx-auto bg-slate-800">
+        <div className="flex items-center justify-between mb-10">
+          <h1 className="text-sm uppercase tracking-widest text-neutral-400">
+            Upload artwork
+          </h1>
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-neutral-600">{user.email}</span>
+            <button
+              onClick={handleLogout}
+              className="text-xs text-neutral-500 hover:text-neutral-300 underline underline-offset-2"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
+        <UploadForm getToken={getToken} />
       </div>
-      <UploadForm getToken={getToken} />
       <MasonryGrid artwork={artwork} />
     </main>
   );
