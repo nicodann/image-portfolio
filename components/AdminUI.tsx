@@ -77,13 +77,15 @@ export default function AdminUI({
   }
 
   return (
-    <main className="px-4">
-      <header className="bg-slate-800 border-b-black border-b-[1.5em]">
-        <div id="admin" className="p-8 max-w-2xl mx-auto">
+    <main id="admin-main" className="px-4">
+      <header className="bg-slate-800 border-b-black border-b-[1.5em] p-8">
+        <h1>{siteInfo.title}</h1>
+        <p>(click to edit title)</p>
+        <div id="upload-form-header" className="p-8 max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-10">
-            <h1 className="text-sm uppercase tracking-widest text-neutral-400">
+            <h2 className="text-sm uppercase tracking-widest text-neutral-400">
               Upload artwork
-            </h1>
+            </h2>
             <div className="flex items-center gap-4">
               <span className="text-xs text-neutral-600">{user.email}</span>
               <HomeButton />
