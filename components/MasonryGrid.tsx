@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 // import type { Artwork } from '@/app/page'
 import Lightbox from "./Lightbox";
-import { Artwork } from "@/types/artwork";
+import { Artwork } from "@/types/types";
 
 export default function MasonryGrid({ artwork }: { artwork: Artwork[] }) {
   const [selected, setSelected] = useState<Artwork | null>(null);

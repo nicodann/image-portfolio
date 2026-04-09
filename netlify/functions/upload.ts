@@ -4,7 +4,7 @@ import { join } from "path";
 import Busboy from "busboy";
 import sharp from "sharp";
 import { v2 as cloudinary } from "cloudinary";
-import { Artwork } from "@/types/artwork";
+import { Artwork } from "@/types/types";
 
 // ---------------------------------------------------------------------------
 // Cloudinary config

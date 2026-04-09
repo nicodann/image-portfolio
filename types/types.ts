@@ -5,3 +5,7 @@ export interface Artwork {
   description: string;
   imageUrl: string;
 }
+
+export interface SiteInfo {
+  title: string;
+}

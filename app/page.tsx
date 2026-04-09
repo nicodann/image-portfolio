@@ -1,18 +1,11 @@
 import { readFileSync } from "fs";
 import { join } from "path";
-import MasonryGrid from "@/components/MasonryGrid";
-import { Artwork } from "@/types/artwork";
+import { Artwork, SiteInfo } from "@/types/types";
+import GalleryUI from "@/components/GalleryUI";
+import { readJsonData } from "@/lib/fetchJsonData";
 
 export default function GalleryPage() {
-  const raw = readFileSync(
-    join(process.cwd(), "content", "artwork.json"),
-    "utf-8",
-  );
-  const artwork: Artwork[] = JSON.parse(raw);
+  const { artwork, siteInfo } = readJsonData();
 
-  return (
-    <main className="min-h-screen p-4 sm:p-6 lg:p-8">
-      <MasonryGrid artwork={artwork} />
-    </main>
-  );
+  return <GalleryUI artwork={artwork} siteInfo={siteInfo} />;
 }

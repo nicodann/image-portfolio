@@ -2,12 +2,19 @@
 
 import { useEffect, useState } from "react";
 import UploadForm from "@/components/UploadForm";
-import MasonryGrid from "@/components/MasonryGrid";
-import { Artwork } from "@/types/artwork";
+import { Artwork, SiteInfo } from "@/types/types";
+import { HomeButton } from "./HomeButton";
+import GalleryUI from "./GalleryUI";
 
 type User = NonNullable<ReturnType<Window["netlifyIdentity"]["currentUser"]>>;
 
-export default function AdminUI({ artwork }: { artwork: Artwork[] }) {
+export default function AdminUI({
+  artwork,
+  siteInfo,
+}: {
+  artwork: Artwork[];
+  siteInfo: SiteInfo;
+}) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -71,24 +78,28 @@ export default function AdminUI({ artwork }: { artwork: Artwork[] }) {
 
   return (
     <main className="px-4">
-      <div id="admin" className="p-8 max-w-2xl mx-auto bg-slate-800">
-        <div className="flex items-center justify-between mb-10">
-          <h1 className="text-sm uppercase tracking-widest text-neutral-400">
-            Upload artwork
-          </h1>
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-neutral-600">{user.email}</span>
-            <button
-              onClick={handleLogout}
-              className="text-xs text-neutral-500 hover:text-neutral-300 underline underline-offset-2"
-            >
-              Sign out
-            </button>
+      <header className="bg-slate-800 border-b-black border-b-[1.5em]">
+        <div id="admin" className="p-8 max-w-2xl mx-auto">
+          <div className="flex items-center justify-between mb-10">
+            <h1 className="text-sm uppercase tracking-widest text-neutral-400">
+              Upload artwork
+            </h1>
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-neutral-600">{user.email}</span>
+              <HomeButton />
+              <button
+                onClick={handleLogout}
+                className="text-xs text-neutral-500 hover:text-neutral-300 underline underline-offset-2"
+              >
+                Sign out
+              </button>
+            </div>
           </div>
+          <UploadForm getToken={getToken} />
         </div>
-        <UploadForm getToken={getToken} />
-      </div>
-      <MasonryGrid artwork={artwork} />
+      </header>
+      <GalleryUI artwork={artwork} siteInfo={siteInfo} />
+      {/* <MasonryGrid artwork={artwork} /> */}
     </main>
   );
 }
