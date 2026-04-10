@@ -53,7 +53,7 @@ export default function AdminHeader({
           className="flex justify-center"
         >
           <CustomButton onClick={() => setIsUploadModalOpen(true)}>
-            Upload aArtwork
+            Upload Artwork
           </CustomButton>
         </div>
 

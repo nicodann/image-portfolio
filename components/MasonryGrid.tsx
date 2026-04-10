@@ -6,7 +6,15 @@ import Image from "next/image";
 import Lightbox from "./Lightbox";
 import { Artwork } from "@/types/types";
 
-export default function MasonryGrid({ artwork }: { artwork: Artwork[] }) {
+export default function MasonryGrid({
+  artwork,
+  onDelete,
+  onEdit,
+}: {
+  artwork: Artwork[];
+  onDelete?: (artwork: Artwork) => void;
+  onEdit?: (artwork: Artwork) => void;
+}) {
   const [selected, setSelected] = useState<Artwork | null>(null);
 
   if (artwork.length === 0) {
@@ -21,7 +29,7 @@ export default function MasonryGrid({ artwork }: { artwork: Artwork[] }) {
     <>
       <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
         {artwork.map((artwork) => (
-          <button
+          <div
             key={artwork.id}
             className="break-inside-avoid mb-4 w-full text-left group relative block overflow-hidden rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
             onClick={() => setSelected(artwork)}
@@ -37,17 +45,65 @@ export default function MasonryGrid({ artwork }: { artwork: Artwork[] }) {
               />
             </div>
             <div className="pt-2 pb-1">
-              <p className="text-sm font-medium text-neutral-100 leading-snug">
-                {artwork.title}
-              </p>
-              <p className="text-xs text-neutral-500">{artwork.year}</p>
+              <div className="flex flex-col">
+                <div
+                  id="metadata-title-delete"
+                  className="flex justify-between w-full items-baseline"
+                >
+                  <p className="text-sm font-medium text-neutral-100 leading-snug">
+                    {artwork.title}
+                  </p>
+                  {onDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(artwork);
+                      }}
+                      className="text-xs text-neutral-500 hover:text-red-400 transition-colors"
+                      aria-label={`Delete ${artwork.title}`}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+                <div
+                  id="metadata_year_edit"
+                  className="flex justify-between w-full"
+                >
+                  <p className="text-xs text-neutral-500">{artwork.year}</p>
+                  {onEdit && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(artwork);
+                      }}
+                      className="text-xs text-neutral-500 hover:text-neutral-100 transition-colors"
+                      aria-label={`Edit ${artwork.title}`}
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-          </button>
+          </div>
         ))}
       </div>
 
       {selected && (
-        <Lightbox artwork={selected} onClose={() => setSelected(null)} />
+        <Lightbox
+          artwork={selected}
+          onClose={() => setSelected(null)}
+          onDelete={
+            onDelete
+              ? () => {
+                  onDelete(selected);
+                  setSelected(null);
+                }
+              : undefined
+          }
+          onEdit={onEdit ? () => onEdit(selected) : undefined}
+        />
       )}
     </>
   );
