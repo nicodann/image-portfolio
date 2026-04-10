@@ -50,7 +50,7 @@ async function editGithubSiteInfo(siteInfo: SiteInfo): Promise<void> {
       method: "PUT",
       headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify({
-        message: `Add artwork: ${siteInfo.title}`,
+        message: `Edit title: ${siteInfo.title}`,
         content: newContent,
         sha: fileData.sha,
         branch,

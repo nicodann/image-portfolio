@@ -1,15 +1,31 @@
-import { useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 type Status = { type: "success" | "error"; message: string } | null;
 
 export default function UploadSiteInfoForm({
   getToken,
+  setIsEditingTitle,
 }: {
   getToken: () => string | null;
+  setIsEditingTitle: Dispatch<SetStateAction<boolean>>;
 }) {
   const [status, setStatus] = useState<Status>(null);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const [titleInputValue, setTitleInputValue] = useState("");
+  const inputWidthRef = useRef<HTMLSpanElement>(null);
+  const [inputWidth, setInputWidth] = useState<number | undefined>(20);
+
+  useLayoutEffect(() => {
+    inputWidthRef.current?.getBoundingClientRect().width &&
+      setInputWidth(inputWidthRef.current?.getBoundingClientRect().width);
+  }, [titleInputValue]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,13 +72,29 @@ export default function UploadSiteInfoForm({
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <div>
+      <div className="flex gap-4">
+        <span
+          aria-hidden
+          ref={inputWidthRef}
+          className="input-title absolute invisible whitespace-pre"
+        >
+          {titleInputValue}
+        </span>
         <input
-          id="title"
           name="title"
           type="text"
           required
-          className="w-full bg-neutral-900 border border-neutral-700 rounded-sm px-3 py-2 text-sm text-neutral-100 focus:outline-none focus:border-neutral-400"
+          autoFocus
+          value={titleInputValue}
+          // onChange={() =>
+          //   setInputWidth(inputWidthRef.current?.getBoundingClientRect().width)
+          // }
+          style={{ width: `${inputWidth}px` }}
+          onChange={(e) => {
+            setTitleInputValue(e.target.value);
+          }}
+          // style={{ width: `${Math.max(titleInputValue.length * 0.9, 1)}ch` }}
+          className="input-title bg-blue-400 border-none outline-none p-0 leading-none"
         />
         {status && (
           <p
@@ -76,6 +108,7 @@ export default function UploadSiteInfoForm({
         <button type="submit" disabled={loading}>
           {loading ? "Submitting" : "Submit"}
         </button>
+        <button onClick={() => setIsEditingTitle(false)}>X</button>
       </div>
     </form>
   );

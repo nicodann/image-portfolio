@@ -1,6 +1,3 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-import { Artwork, SiteInfo } from "@/types/types";
 import GalleryUI from "@/components/GalleryUI";
 import { readJsonData } from "@/lib/fetchJsonData";
 

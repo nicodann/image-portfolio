@@ -18,6 +18,8 @@ export default function AdminUI({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
+  const [autoLoggedOut, setAutoLoggedOut] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
 
   useEffect(() => {
     function init() {
@@ -25,8 +27,9 @@ export default function AdminUI({
       ni.init();
       setUser(ni.currentUser() ?? null);
       setReady(true);
-      ni.on("login", (u) => {
-        setUser(u ?? null);
+      ni.on("login", (user) => {
+        setUser(user ?? null);
+        setAutoLoggedOut(false);
         ni.close();
       });
       ni.on("logout", () => setUser(null));
@@ -47,6 +50,21 @@ export default function AdminUI({
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const u = window.netlifyIdentity.currentUser();
+      if (u && u.token?.expires_at) {
+        const expiresAt = u.token.expires_at * 1000;
+        if (Date.now() >= expiresAt) {
+          setAutoLoggedOut(true);
+          window.netlifyIdentity.logout();
+        }
+      }
+    }, 1_000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   function getToken(): string | null {
     return window.netlifyIdentity.currentUser()?.token?.access_token ?? null;
   }
@@ -54,6 +72,8 @@ export default function AdminUI({
   function handleLogout() {
     window.netlifyIdentity.logout();
   }
+
+  //// RENDER
 
   if (!ready) {
     return (
@@ -66,6 +86,11 @@ export default function AdminUI({
   if (!user) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center gap-4">
+        {autoLoggedOut && (
+          <p className="text-yellow-400 text-sm">
+            Your session expired. Please sign in again.
+          </p>
+        )}
         <p className="text-neutral-400 text-sm">Sign in to manage artwork.</p>
         <button
           onClick={() => window.netlifyIdentity.open("login")}
@@ -80,8 +105,22 @@ export default function AdminUI({
   return (
     <main id="admin-main" className="px-4">
       <header className="bg-slate-800 border-b-black border-b-[1.5em] p-8">
-        <h1>{siteInfo.title}</h1>
-        <UploadSiteInfoForm getToken={getToken} />
+        <div className="h-12">
+          {!isEditingTitle ? (
+            <h1
+              id="title"
+              onClick={() => setIsEditingTitle(true)}
+              className="cursor-pointer leading-tight max-w-72"
+            >
+              {siteInfo.title}
+            </h1>
+          ) : (
+            <UploadSiteInfoForm
+              getToken={getToken}
+              setIsEditingTitle={setIsEditingTitle}
+            />
+          )}
+        </div>
         <p>(click to edit title)</p>
         <div id="upload-form-header" className="p-8 max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-10">
