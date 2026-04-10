@@ -11,9 +11,11 @@ import CustomButton from "./CustomButton";
 export default function AdminHeader({
   siteInfo,
   user,
+  onOpenSettings,
 }: {
   siteInfo: SiteInfo;
   user: NetlifyUser;
+  onOpenSettings: () => void;
 }) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -61,7 +63,12 @@ export default function AdminHeader({
           id="header-nav-links"
           className="flex flex-col lg:flex-row justify-end items-center gap-1 lg:gap-4 text-xs xl:text-lg text-neutral-400"
         >
-          <span>{user.email}</span>
+          <button
+            onClick={onOpenSettings}
+            className="hover:text-neutral-300 hover:underline underline-offset-2"
+          >
+            {user.user_metadata?.full_name || user.email}
+          </button>
           <Link
             href="/"
             className="underline underline-offset-2 hover:text-neutral-300"

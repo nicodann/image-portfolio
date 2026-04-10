@@ -6,6 +6,7 @@ import MasonryGrid from "./MasonryGrid";
 import AdminHeader from "./AdminHeader";
 import Modal from "./Modal";
 import EditArtworkForm from "./EditArtworkForm";
+import UserSettingsForm from "./UserSettingsForm";
 
 export default function AdminUI({
   artwork,
@@ -21,6 +22,7 @@ export default function AdminUI({
   const [pendingDelete, setPendingDelete] = useState<Artwork | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [pendingEdit, setPendingEdit] = useState<Artwork | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   function getToken(): string | null {
     return window.netlifyIdentity.currentUser()?.token?.access_token ?? null;
@@ -134,12 +136,34 @@ export default function AdminUI({
 
   return (
     <main id="admin-main" className="px-4">
-      <AdminHeader siteInfo={siteInfo} user={user} />
+      <AdminHeader
+        siteInfo={siteInfo}
+        user={user}
+        onOpenSettings={() => setSettingsOpen(true)}
+      />
       <MasonryGrid
         artwork={artworkList}
         onDelete={setPendingDelete}
         onEdit={setPendingEdit}
       />
+
+      {settingsOpen && (
+        <Modal onClose={() => setSettingsOpen(false)}>
+          <div className="bg-neutral-900 rounded-sm p-8 max-w-lg w-full">
+            <h2 className="text-sm uppercase tracking-widest text-neutral-400 mb-8">
+              Settings
+            </h2>
+            <UserSettingsForm
+              user={user}
+              getToken={getToken}
+              onSuccess={(updatedUser) => {
+                setUser(updatedUser);
+                setSettingsOpen(false);
+              }}
+            />
+          </div>
+        </Modal>
+      )}
 
       {pendingEdit && (
         <Modal onClose={() => setPendingEdit(null)}>

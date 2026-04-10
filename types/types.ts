@@ -12,4 +12,9 @@ export interface SiteInfo {
 
 export type NetlifyUser = NonNullable<
   ReturnType<Window["netlifyIdentity"]["currentUser"]>
->;
+> & {
+  user_metadata?: {
+    full_name?: string;
+    avatar_url?: string;
+  };
+};
