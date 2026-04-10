@@ -27,7 +27,10 @@ export default function AdminHeader({
   }
   return (
     <header className="bg-slate-800 border-b-black border-b-[1.5em] p-8">
-      <div id="header-row-1" className="flex justify-between items-center ">
+      <div
+        id="header-row-1"
+        className="flex flex-col gap-4 md:grid grid-cols-3 items-center"
+      >
         <div id="header-title-box">
           {!isEditingTitle ? (
             <h1
@@ -45,13 +48,18 @@ export default function AdminHeader({
           )}
         </div>
 
-        <CustomButton onClick={() => setIsUploadModalOpen(true)}>
-          Upload aArtwork
-        </CustomButton>
+        <div
+          id="header-upload-button-container"
+          className="flex justify-center"
+        >
+          <CustomButton onClick={() => setIsUploadModalOpen(true)}>
+            Upload aArtwork
+          </CustomButton>
+        </div>
 
         <div
           id="header-nav-links"
-          className="flex items-center gap-4 text-xs lg:text-lg text-neutral-400"
+          className="flex flex-col lg:flex-row justify-end items-center gap-1 lg:gap-4 text-xs xl:text-lg text-neutral-400"
         >
           <span>{user.email}</span>
           <Link
@@ -68,22 +76,23 @@ export default function AdminHeader({
           </button>
         </div>
 
-        {isUploadModalOpen && (
-          <Modal onClose={() => setIsUploadModalOpen(false)}>
-            <div id="upload-form-header" className="p-8 max-w-2xl mx-auto">
-              <div className="flex items-center justify-between mb-10">
-                <h2 className="text-sm uppercase tracking-widest text-neutral-400">
-                  Upload artwork
-                </h2>
-              </div>
-              <UploadForm getToken={getToken} />
+        {/* <div className="col-span-3">
+          {!isEditingTitle && <p>(click to edit title)</p>}
+        </div> */}
+      </div>
+
+      {isUploadModalOpen && (
+        <Modal onClose={() => setIsUploadModalOpen(false)}>
+          <div id="upload-form-header" className="p-8 max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-10">
+              <h2 className="text-sm uppercase tracking-widest text-neutral-400">
+                Upload artwork
+              </h2>
             </div>
-          </Modal>
-        )}
-      </div>
-      <div id="header-row-2">
-        {!isEditingTitle && <p>(click to edit title)</p>}
-      </div>
+            <UploadForm getToken={getToken} />
+          </div>
+        </Modal>
+      )}
     </header>
   );
 }
