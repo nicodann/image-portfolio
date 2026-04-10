@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
+import CustomButton from "./CustomButton";
 
 type Status = { type: "success" | "error"; message: string } | null;
 
@@ -72,30 +73,40 @@ export default function UploadSiteInfoForm({
 
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <div className="flex gap-4">
-        <span
-          aria-hidden
-          ref={inputWidthRef}
-          className="input-title absolute invisible whitespace-pre"
+      <div className="flex flex-col gap-4">
+        <div
+          id="form-fields_buttons"
+          className="flex gap-4 items-center flex-wrap"
         >
-          {titleInputValue}
-        </span>
-        <input
-          name="title"
-          type="text"
-          required
-          autoFocus
-          value={titleInputValue}
-          // onChange={() =>
-          //   setInputWidth(inputWidthRef.current?.getBoundingClientRect().width)
-          // }
-          style={{ width: `${inputWidth}px` }}
-          onChange={(e) => {
-            setTitleInputValue(e.target.value);
-          }}
-          // style={{ width: `${Math.max(titleInputValue.length * 0.9, 1)}ch` }}
-          className="input-title bg-blue-400 border-none outline-none p-0 leading-none"
-        />
+          <span
+            aria-hidden
+            ref={inputWidthRef}
+            className="input-title absolute invisible whitespace-pre"
+          >
+            {titleInputValue}
+          </span>
+          <input
+            name="title"
+            type="text"
+            required
+            autoFocus
+            value={titleInputValue}
+            style={{ width: `${inputWidth}px` }}
+            onChange={(e) => {
+              setTitleInputValue(e.target.value);
+            }}
+            className="input-title bg-transparent border-none outline-none p-0 leading-none"
+          />
+
+          <CustomButton type="submit" disabled={loading}>
+            {loading ? "Submitting" : "Submit"}
+          </CustomButton>
+
+          <CustomButton onClick={() => setIsEditingTitle(false)}>
+            X
+          </CustomButton>
+        </div>
+
         {status && (
           <p
             className={`text-sm ${
@@ -105,10 +116,6 @@ export default function UploadSiteInfoForm({
             {status.message}
           </p>
         )}
-        <button type="submit" disabled={loading}>
-          {loading ? "Submitting" : "Submit"}
-        </button>
-        <button onClick={() => setIsEditingTitle(false)}>X</button>
       </div>
     </form>
   );

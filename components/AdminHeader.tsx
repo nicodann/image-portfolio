@@ -6,6 +6,7 @@ import { useState } from "react";
 import UploadForm from "./UploadForm";
 import Modal from "./Modal";
 import Link from "next/link";
+import CustomButton from "./CustomButton";
 
 export default function AdminHeader({
   siteInfo,
@@ -25,9 +26,9 @@ export default function AdminHeader({
     window.netlifyIdentity.logout();
   }
   return (
-    <header className="flex justify-between bg-slate-800 border-b-black border-b-[1.5em] p-8">
-      <div id="header-title-box">
-        <div className="h-12">
+    <header className="bg-slate-800 border-b-black border-b-[1.5em] p-8">
+      <div id="header-row-1" className="flex justify-between items-center ">
+        <div id="header-title-box">
           {!isEditingTitle ? (
             <h1
               id="title"
@@ -43,47 +44,46 @@ export default function AdminHeader({
             />
           )}
         </div>
-        <p>(click to edit title)</p>
-      </div>
 
-      <button
-        className="bg-neutral-400 hover:border-2 text-black text-2xl px-4 rounded-xl h-12"
-        onClick={() => setIsUploadModalOpen(true)}
-      >
-        Upload Image
-      </button>
+        <CustomButton onClick={() => setIsUploadModalOpen(true)}>
+          Upload aArtwork
+        </CustomButton>
 
-      <div
-        id="header-nav-links"
-        className="flex items-center gap-4 text-xs lg:text-lg text-neutral-400"
-      >
-        <span>{user.email}</span>
-        <Link
-          href="/"
-          className="underline underline-offset-2 hover:text-neutral-300"
+        <div
+          id="header-nav-links"
+          className="flex items-center gap-4 text-xs lg:text-lg text-neutral-400"
         >
-          Go to Main Site
-        </Link>
-        <button
-          onClick={handleLogout}
-          className="hover:text-neutral-300 underline underline-offset-2"
-        >
-          Sign out
-        </button>
-      </div>
+          <span>{user.email}</span>
+          <Link
+            href="/"
+            className="underline underline-offset-2 hover:text-neutral-300"
+          >
+            Go to Main Site
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="hover:text-neutral-300 underline underline-offset-2"
+          >
+            Sign out
+          </button>
+        </div>
 
-      {isUploadModalOpen && (
-        <Modal onClose={() => setIsUploadModalOpen(false)}>
-          <div id="upload-form-header" className="p-8 max-w-2xl mx-auto">
-            <div className="flex items-center justify-between mb-10">
-              <h2 className="text-sm uppercase tracking-widest text-neutral-400">
-                Upload artwork
-              </h2>
+        {isUploadModalOpen && (
+          <Modal onClose={() => setIsUploadModalOpen(false)}>
+            <div id="upload-form-header" className="p-8 max-w-2xl mx-auto">
+              <div className="flex items-center justify-between mb-10">
+                <h2 className="text-sm uppercase tracking-widest text-neutral-400">
+                  Upload artwork
+                </h2>
+              </div>
+              <UploadForm getToken={getToken} />
             </div>
-            <UploadForm getToken={getToken} />
-          </div>
-        </Modal>
-      )}
+          </Modal>
+        )}
+      </div>
+      <div id="header-row-2">
+        {!isEditingTitle && <p>(click to edit title)</p>}
+      </div>
     </header>
   );
 }
