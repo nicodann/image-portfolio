@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { Artwork } from "@/types/types";
 
 interface UploadImageFormProps {
   getToken: () => string | null;
+  onSuccess?: (artwork: Artwork) => void;
 }
 
 type Status = { type: "success" | "error"; message: string } | null;
 
-export default function UploadImageForm({ getToken }: UploadImageFormProps) {
+export default function UploadImageForm({ getToken, onSuccess }: UploadImageFormProps) {
   const [status, setStatus] = useState<Status>(null);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -39,12 +41,13 @@ export default function UploadImageForm({ getToken }: UploadImageFormProps) {
         throw new Error(body.error || `Upload failed (${res.status})`);
       }
 
+      const artwork: Artwork = await res.json();
       setStatus({
         type: "success",
-        message:
-          "Artwork uploaded successfully. The site will rebuild shortly.",
+        message: "Artwork uploaded successfully. The site will rebuild shortly.",
       });
       formRef.current?.reset();
+      onSuccess?.(artwork);
     } catch (err) {
       setStatus({
         type: "error",

@@ -1,6 +1,6 @@
 "use client";
 
-import { SiteInfo, NetlifyUser } from "@/types/types";
+import { SiteInfo, NetlifyUser, Artwork } from "@/types/types";
 import UploadSiteInfoForm from "./UploadSiteInfoForm";
 import { useState } from "react";
 import UploadImageForm from "./UploadImageForm";
@@ -12,10 +12,12 @@ export default function AdminHeader({
   siteInfo,
   user,
   onOpenSettings,
+  onArtworkUploaded,
 }: {
   siteInfo: SiteInfo;
   user: NetlifyUser;
   onOpenSettings: () => void;
+  onArtworkUploaded: (artwork: Artwork) => void;
 }) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -96,7 +98,7 @@ export default function AdminHeader({
                 Upload artwork
               </h2>
             </div>
-            <UploadImageForm getToken={getToken} />
+            <UploadImageForm getToken={getToken} onSuccess={onArtworkUploaded} />
           </div>
         </Modal>
       )}

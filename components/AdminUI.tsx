@@ -140,6 +140,7 @@ export default function AdminUI({
         siteInfo={siteInfo}
         user={user}
         onOpenSettings={() => setSettingsOpen(true)}
+        onArtworkUploaded={(a) => setArtworkList((prev) => [a, ...prev])}
       />
       <MasonryGrid
         artwork={artworkList}
