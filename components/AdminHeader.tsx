@@ -19,7 +19,9 @@ export default function AdminHeader({
   onOpenSettings: () => void;
   onArtworkUploaded: (artwork: Artwork) => void;
 }) {
+  const [displayTitle, setDisplayTitle] = useState(siteInfo.title);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [titleError, setTitleError] = useState<string | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   function getToken(): string | null {
@@ -37,17 +39,24 @@ export default function AdminHeader({
       >
         <div id="header-title-box">
           {!isEditingTitle ? (
-            <h1
-              id="title"
-              onClick={() => setIsEditingTitle(true)}
-              className="cursor-pointer leading-tight max-w-72"
-            >
-              {siteInfo.title}
-            </h1>
+            <>
+              <h1
+                id="title"
+                onClick={() => { setIsEditingTitle(true); setTitleError(null); }}
+                className="cursor-pointer leading-tight max-w-72"
+              >
+                {displayTitle}
+              </h1>
+              {titleError && (
+                <p className="text-xs text-red-400 mt-1">{titleError}</p>
+              )}
+            </>
           ) : (
             <UploadSiteInfoForm
               getToken={getToken}
               setIsEditingTitle={setIsEditingTitle}
+              onOptimisticUpdate={setDisplayTitle}
+              onError={(msg) => { setDisplayTitle(siteInfo.title); setTitleError(msg); }}
             />
           )}
         </div>
