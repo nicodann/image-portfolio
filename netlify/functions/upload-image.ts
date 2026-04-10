@@ -5,7 +5,8 @@ import Busboy from "busboy";
 import sharp from "sharp";
 import { v2 as cloudinary } from "cloudinary";
 import { Artwork } from "@/types/types";
-import { verifyToken } from "@/lib/verifyToken";
+import { requireAuth } from "@/lib/netlifyAuth";
+import { updateGithubFile } from "@/lib/github";
 
 // ---------------------------------------------------------------------------
 // Cloudinary config
@@ -86,55 +87,6 @@ function uploadToCloudinary(buffer: Buffer): Promise<string> {
   });
 }
 
-/** Read → append → write artwork.json via the GitHub Contents API. */
-async function prependArtwork(artwork: Artwork): Promise<void> {
-  const token = process.env.GITHUB_TOKEN;
-  const repo = process.env.GITHUB_REPO;
-  const branch = process.env.GITHUB_BRANCH || "main";
-
-  if (!token || !repo)
-    throw new Error("Missing GITHUB_TOKEN or GITHUB_REPO env vars");
-
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    Accept: "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
-  };
-
-  // GET current file
-  const getRes = await fetch(
-    `https://api.github.com/repos/${repo}/contents/${ARTWORK_PATH}?ref=${branch}`,
-    { headers },
-  );
-  if (!getRes.ok) throw new Error(`GitHub GET failed: ${getRes.status}`);
-
-  const fileData = (await getRes.json()) as { content: string; sha: string };
-  const current: Artwork[] = JSON.parse(
-    Buffer.from(fileData.content, "base64").toString("utf-8"),
-  );
-
-  const updated = [artwork, ...current];
-  const newContent = Buffer.from(
-    JSON.stringify(updated, null, 2) + "\n",
-  ).toString("base64");
-
-  // PUT updated file
-  const putRes = await fetch(
-    `https://api.github.com/repos/${repo}/contents/${ARTWORK_PATH}`,
-    {
-      method: "PUT",
-      headers: { ...headers, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: `Add artwork: ${artwork.title}`,
-        content: newContent,
-        sha: fileData.sha,
-        branch,
-      }),
-    },
-  );
-  if (!putRes.ok) throw new Error(`GitHub PUT failed: ${putRes.status}`);
-}
-
 // ---------------------------------------------------------------------------
 // Handler
 // ---------------------------------------------------------------------------
@@ -147,28 +99,8 @@ export const handler: Handler = async (event) => {
   }
 
   // --- Auth ---
-  const authHeader =
-    event.headers["authorization"] ?? event.headers["Authorization"] ?? "";
-  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-
-  if (!token) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({
-        error: "User not logged in: Missing authorization token.",
-      }),
-    };
-  }
-
-  const tokenValid = await verifyToken(token);
-  if (!tokenValid) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({
-        error: "Session expired, please login again: Invalid or expired token",
-      }),
-    };
-  }
+  const authError = await requireAuth(event);
+  if (authError) return authError;
 
   // --- Parse form ---
   let parsed: ParsedForm;
@@ -251,7 +183,11 @@ export const handler: Handler = async (event) => {
 
   // --- Commit to GitHub ---
   try {
-    await prependArtwork(artwork);
+    await updateGithubFile<Artwork[]>(
+      ARTWORK_PATH,
+      `Add artwork: ${artwork.title}`,
+      (current) => [artwork, ...current],
+    );
   } catch (err) {
     console.error("GitHub error:", err);
     return {

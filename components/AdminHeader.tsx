@@ -3,7 +3,7 @@
 import { SiteInfo, NetlifyUser } from "@/types/types";
 import UploadSiteInfoForm from "./UploadSiteInfoForm";
 import { useState } from "react";
-import UploadForm from "./UploadForm";
+import UploadImageForm from "./UploadImageForm";
 import Modal from "./Modal";
 import Link from "next/link";
 import CustomButton from "./CustomButton";
@@ -89,7 +89,7 @@ export default function AdminHeader({
                 Upload artwork
               </h2>
             </div>
-            <UploadForm getToken={getToken} />
+            <UploadImageForm getToken={getToken} />
           </div>
         </Modal>
       )}

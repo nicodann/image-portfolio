@@ -2,13 +2,13 @@
 
 import { useState, useRef } from "react";
 
-interface UploadFormProps {
+interface UploadImageFormProps {
   getToken: () => string | null;
 }
 
 type Status = { type: "success" | "error"; message: string } | null;
 
-export default function UploadForm({ getToken }: UploadFormProps) {
+export default function UploadImageForm({ getToken }: UploadImageFormProps) {
   const [status, setStatus] = useState<Status>(null);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -28,7 +28,7 @@ export default function UploadForm({ getToken }: UploadFormProps) {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/upload", {
+      const res = await fetch("/api/upload-image", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: data,

@@ -10,8 +10,8 @@
   node_bundler = "esbuild"
 
 [[redirects]]
-  from = "/api/upload"
-  to = "/.netlify/functions/upload"
+  from = "/api/upload-image"
+  to = "/.netlify/functions/upload-image"
   status = 200
   force = true
 
