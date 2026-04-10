@@ -20,6 +20,7 @@ interface NetlifyIdentityWidget {
     cb: (user?: NetlifyIdentityUser) => void
   ) => void
   off: (event: string, cb?: () => void) => void
+  refresh: (force?: boolean) => Promise<NetlifyIdentityUser>
 }
 
 declare global {

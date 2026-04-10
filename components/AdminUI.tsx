@@ -91,16 +91,23 @@ export default function AdminUI({
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       const u = window.netlifyIdentity.currentUser();
-      if (u && u.token?.expires_at) {
-        const expiresAt = u.token.expires_at * 1000;
-        if (Date.now() >= expiresAt) {
+      if (!u?.token?.expires_at) return;
+
+      const expiresAt = u.token.expires_at * 1000;
+      const fiveMinutes = 5 * 60 * 1000;
+
+      if (Date.now() >= expiresAt - fiveMinutes) {
+        try {
+          const refreshed = await window.netlifyIdentity.refresh();
+          setUser(refreshed as NetlifyUser);
+        } catch {
           setAutoLoggedOut(true);
           window.netlifyIdentity.logout();
         }
       }
-    }, 1_000);
+    }, 60_000);
 
     return () => clearInterval(interval);
   }, []);
