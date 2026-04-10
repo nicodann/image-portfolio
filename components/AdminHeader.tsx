@@ -30,10 +30,10 @@ export default function AdminHeader({
     window.netlifyIdentity.logout();
   }
   return (
-    <header className="bg-slate-800 border-b-black border-b-[1.5em] p-8">
+    <header className="mb-4 pt-8">
       <div
         id="header-row-1"
-        className="flex flex-col gap-4 md:grid grid-cols-3 items-center"
+        className="flex flex-col gap-4 md:grid grid-cols-3 items-center px-8"
       >
         <div id="header-title-box">
           {!isEditingTitle ? (
@@ -90,6 +90,20 @@ export default function AdminHeader({
         </div> */}
       </div>
 
+      <svg
+        className="w-full mt-6 text-neutral-600"
+        viewBox="0 0 1200 30"
+        preserveAspectRatio="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M0,15 Q150,3 300,15 Q450,27 600,15 Q750,3 900,15 Q1050,27 1200,15"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        />
+      </svg>
+
       {isUploadModalOpen && (
         <Modal onClose={() => setIsUploadModalOpen(false)}>
           <div id="upload-form-header" className="p-8 max-w-2xl mx-auto">
@@ -98,7 +112,10 @@ export default function AdminHeader({
                 Upload artwork
               </h2>
             </div>
-            <UploadImageForm getToken={getToken} onSuccess={onArtworkUploaded} />
+            <UploadImageForm
+              getToken={getToken}
+              onSuccess={onArtworkUploaded}
+            />
           </div>
         </Modal>
       )}
