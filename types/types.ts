@@ -9,3 +9,7 @@ export interface Artwork {
 export interface SiteInfo {
   title: string;
 }
+
+export type NetlifyUser = NonNullable<
+  ReturnType<Window["netlifyIdentity"]["currentUser"]>
+>;

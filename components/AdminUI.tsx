@@ -1,13 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import UploadForm from "@/components/UploadForm";
-import { Artwork, SiteInfo } from "@/types/types";
-import { HomeButton } from "./HomeButton";
-import GalleryUI from "./GalleryUI";
-import UploadSiteInfoForm from "./UploadSiteInfoForm";
-
-type User = NonNullable<ReturnType<Window["netlifyIdentity"]["currentUser"]>>;
+import { Artwork, SiteInfo, NetlifyUser } from "@/types/types";
+import MasonryGrid from "./MasonryGrid";
+import AdminHeader from "./AdminHeader";
 
 export default function AdminUI({
   artwork,
@@ -16,10 +12,9 @@ export default function AdminUI({
   artwork: Artwork[];
   siteInfo: SiteInfo;
 }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<NetlifyUser | null>(null);
   const [ready, setReady] = useState(false);
   const [autoLoggedOut, setAutoLoggedOut] = useState(false);
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
 
   useEffect(() => {
     function init() {
@@ -65,15 +60,7 @@ export default function AdminUI({
     return () => clearInterval(interval);
   }, []);
 
-  function getToken(): string | null {
-    return window.netlifyIdentity.currentUser()?.token?.access_token ?? null;
-  }
-
-  function handleLogout() {
-    window.netlifyIdentity.logout();
-  }
-
-  //// RENDER
+  //// RENDER //////////////////////////
 
   if (!ready) {
     return (
@@ -104,45 +91,8 @@ export default function AdminUI({
 
   return (
     <main id="admin-main" className="px-4">
-      <header className="bg-slate-800 border-b-black border-b-[1.5em] p-8">
-        <div className="h-12">
-          {!isEditingTitle ? (
-            <h1
-              id="title"
-              onClick={() => setIsEditingTitle(true)}
-              className="cursor-pointer leading-tight max-w-72"
-            >
-              {siteInfo.title}
-            </h1>
-          ) : (
-            <UploadSiteInfoForm
-              getToken={getToken}
-              setIsEditingTitle={setIsEditingTitle}
-            />
-          )}
-        </div>
-        <p>(click to edit title)</p>
-        <div id="upload-form-header" className="p-8 max-w-2xl mx-auto">
-          <div className="flex items-center justify-between mb-10">
-            <h2 className="text-sm uppercase tracking-widest text-neutral-400">
-              Upload artwork
-            </h2>
-            <div className="flex items-center gap-4">
-              <span className="text-xs text-neutral-600">{user.email}</span>
-              <HomeButton />
-              <button
-                onClick={handleLogout}
-                className="text-xs text-neutral-500 hover:text-neutral-300 underline underline-offset-2"
-              >
-                Sign out
-              </button>
-            </div>
-          </div>
-          <UploadForm getToken={getToken} />
-        </div>
-      </header>
-      <GalleryUI artwork={artwork} siteInfo={siteInfo} />
-      {/* <MasonryGrid artwork={artwork} /> */}
+      <AdminHeader siteInfo={siteInfo} user={user} />
+      <MasonryGrid artwork={artwork} />
     </main>
   );
 }
