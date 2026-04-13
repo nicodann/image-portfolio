@@ -48,7 +48,10 @@ export default function AdminUI({
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ id: pendingDelete.id, imageUrl: pendingDelete.imageUrl }),
+      body: JSON.stringify({
+        id: pendingDelete.id,
+        imageUrl: pendingDelete.imageUrl,
+      }),
     });
     setIsDeleting(false);
 
@@ -62,11 +65,30 @@ export default function AdminUI({
   }
 
   useEffect(() => {
-    function init() {
+    async function checkToken() {
+      const u = window.netlifyIdentity.currentUser();
+      if (!u?.token?.expires_at) return;
+
+      const expiresAt = u.token.expires_at * 1000;
+      const fiveMinutes = 5 * 60 * 1000;
+
+      if (Date.now() >= expiresAt - fiveMinutes) {
+        try {
+          const refreshed = await window.netlifyIdentity.refresh(true);
+          setUser(refreshed as NetlifyUser);
+        } catch {
+          setAutoLoggedOut(true);
+          window.netlifyIdentity.logout();
+        }
+      }
+    }
+
+    async function init() {
       const ni = window.netlifyIdentity;
       ni.init();
       setUser(ni.currentUser() ?? null);
       setReady(true);
+      await checkToken();
       ni.on("login", (user) => {
         setUser(user ?? null);
         setAutoLoggedOut(false);
@@ -77,39 +99,18 @@ export default function AdminUI({
 
     if (window.netlifyIdentity) {
       init();
-      return;
+    } else {
+      const interval = setInterval(() => {
+        if (window.netlifyIdentity) {
+          clearInterval(interval);
+          init();
+        }
+      }, 50);
+      return () => clearInterval(interval);
     }
 
-    const interval = setInterval(() => {
-      if (window.netlifyIdentity) {
-        clearInterval(interval);
-        init();
-      }
-    }, 50);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const u = window.netlifyIdentity.currentUser();
-      if (!u?.token?.expires_at) return;
-
-      const expiresAt = u.token.expires_at * 1000;
-      const fiveMinutes = 5 * 60 * 1000;
-
-      if (Date.now() >= expiresAt - fiveMinutes) {
-        try {
-          const refreshed = await window.netlifyIdentity.refresh();
-          setUser(refreshed as NetlifyUser);
-        } catch {
-          setAutoLoggedOut(true);
-          window.netlifyIdentity.logout();
-        }
-      }
-    }, 60_000);
-
-    return () => clearInterval(interval);
+    const tokenInterval = setInterval(checkToken, 60_000);
+    return () => clearInterval(tokenInterval);
   }, []);
 
   //// RENDER //////////////////////////
@@ -142,7 +143,7 @@ export default function AdminUI({
   }
 
   return (
-    <main id="admin-main" className="px-4">
+    <main id="admin-main">
       <AdminHeader
         siteInfo={siteInfo}
         user={user}
@@ -157,7 +158,7 @@ export default function AdminUI({
 
       {settingsOpen && (
         <Modal onClose={() => setSettingsOpen(false)}>
-          <div className="bg-neutral-900 rounded-sm p-8 max-w-lg w-full">
+          <div className="bg-neutral-900 rounded-sm p-8 max-w-lg w-full bg-purple-800">
             <h2 className="text-sm uppercase tracking-widest text-neutral-400 mb-8">
               Settings
             </h2>

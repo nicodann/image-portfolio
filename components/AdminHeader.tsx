@@ -32,7 +32,7 @@ export default function AdminHeader({
     window.netlifyIdentity.logout();
   }
   return (
-    <header className="mb-4 pt-8">
+    <header className="mb-4 pt-8 bg-neutral-600">
       <div
         id="header-row-1"
         className="flex flex-col gap-4 md:grid grid-cols-3 items-center px-8"
@@ -42,22 +42,28 @@ export default function AdminHeader({
             <>
               <h1
                 id="title"
-                onClick={() => { setIsEditingTitle(true); setTitleError(null); }}
+                onClick={() => {
+                  setIsEditingTitle(true);
+                  setTitleError(null);
+                }}
                 className="cursor-pointer leading-tight max-w-72"
               >
                 {displayTitle}
               </h1>
-              {titleError && (
-                <p className="text-xs text-red-400 mt-1">{titleError}</p>
-              )}
             </>
           ) : (
             <UploadSiteInfoForm
               getToken={getToken}
               setIsEditingTitle={setIsEditingTitle}
               onOptimisticUpdate={setDisplayTitle}
-              onError={(msg) => { setDisplayTitle(siteInfo.title); setTitleError(msg); }}
+              onError={(msg) => {
+                setDisplayTitle(siteInfo.title);
+                setTitleError(msg);
+              }}
             />
+          )}
+          {titleError && (
+            <p className="text-xs text-red-400 mt-1">{titleError}</p>
           )}
         </div>
 
@@ -100,16 +106,14 @@ export default function AdminHeader({
       </div>
 
       <svg
-        className="w-full mt-6 text-neutral-600"
+        className="w-full block mt-6"
         viewBox="0 0 1200 30"
         preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M0,15 Q150,3 300,15 Q450,27 600,15 Q750,3 900,15 Q1050,27 1200,15"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
+          d="M0,15 Q300,0 600,15 Q900,30 1200,15 L1200,30 L0,30 Z"
+          fill="black"
         />
       </svg>
 

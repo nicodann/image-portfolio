@@ -1,5 +1,10 @@
-import { Dispatch, SetStateAction, useLayoutEffect, useRef, useState } from "react";
-
+import {
+  Dispatch,
+  SetStateAction,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 export default function UploadSiteInfoForm({
   getToken,
@@ -78,13 +83,16 @@ export default function UploadSiteInfoForm({
             onChange={(e) => {
               setTitleInputValue(e.target.value);
             }}
-            onKeyDown={(e) => { if (e.key === "Escape") setIsEditingTitle(false); }}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setIsEditingTitle(false);
+            }}
             className="input-title bg-transparent border-none outline-none p-0 leading-none"
           />
 
-          <button type="button" onClick={() => setIsEditingTitle(false)}>X</button>
+          <button type="button" onClick={() => setIsEditingTitle(false)}>
+            X
+          </button>
         </div>
-
       </div>
     </form>
   );
