@@ -36,124 +36,117 @@ export default function AdminHeader({
 
   const animateClassName = "transition-all ease-in-out duration-600";
 
-  return (
-    <>
-      <SiteHeader
-        className={`overflow-hidden ${animateClassName} ${isInPreviewMode ? "max-h-40" : "max-h-0 py-0"}`}
-      >
-        <div
-          id="admin-site-header-container"
-          className="flex justify-between px-4"
+  const HeaderTitleBox = () => (
+    <div id="header-title-box">
+      {isInPreviewMode ? (
+        <h1 id="title" className="leading-tight max-w-72">
+          {displayTitle}
+        </h1>
+      ) : !isEditingTitle ? (
+        <h1
+          id="title"
+          onClick={() => {
+            setIsEditingTitle(true);
+            setTitleError(null);
+          }}
+          className="cursor-pointer leading-tight max-w-72"
         >
-          <h1>{displayTitle}</h1>
+          {displayTitle}
+        </h1>
+      ) : (
+        <UploadSiteInfoForm
+          getToken={getToken}
+          setIsEditingTitle={setIsEditingTitle}
+          onOptimisticUpdate={setDisplayTitle}
+          onError={(msg) => {
+            setDisplayTitle(siteInfo.title);
+            setTitleError(msg);
+          }}
+        />
+      )}
+      {titleError && <p className="text-xs text-red-400 mt-1">{titleError}</p>}
+    </div>
+  );
+
+  const HeaderNavLinks = () => (
+    <div
+      id="header-nav-links"
+      className="flex flex-col md:flex-row justify-end items-center gap-1 lg:gap-4 text-xs xl:text-lg text-neutral-400"
+    >
+      {isInPreviewMode ? (
+        <button
+          onClick={() => setIsInPreviewMode(false)}
+          className="hover:text-neutral-300 underline underline-offset-2 text-xs"
+        >
+          Edit Site
+        </button>
+      ) : (
+        <>
           <button
-            onClick={() => setIsInPreviewMode(false)}
-            className="hover:text-neutral-300 underline underline-offset-2 text-xs"
+            onClick={onOpenSettings}
+            className="hover:text-neutral-300 hover:underline underline-offset-2 text-lg xl:text-xl"
           >
-            Edit Site
+            {user.user_metadata?.full_name || user.email}
           </button>
-        </div>
-      </SiteHeader>
 
-      <SiteHeader
-        className={`bg-neutral-600 overflow-hidden ${animateClassName} ${isInPreviewMode ? "max-h-0 py-0" : "max-h-[800px]"}`}
-      >
+          <button
+            onClick={handleLogout}
+            className="hover:text-neutral-300 underline underline-offset-2"
+          >
+            Sign out
+          </button>
+
+          <button
+            onClick={() => {
+              setIsInPreviewMode(true);
+              setIsEditingTitle(false);
+            }}
+            className="underline underline-offset-2 hover:text-neutral-300"
+          >
+            Preview Site
+          </button>
+        </>
+      )}
+    </div>
+  );
+
+  return (
+    <div id="header-wrapper" className="relative overflow-hidden">
+      <div
+        id="header-admin-animated-background"
+        className={`absolute inset-0 bg-neutral-700 ${animateClassName} ${isInPreviewMode ? "-translate-y-full" : "translate-y-0"}`}
+      />
+      <SiteHeader className={`overflow-hidden relative`}>
         <div
-          id="header-row-1"
-          className="flex flex-col gap-4 md:grid grid-cols-3 items-center px-4"
+          id="header-content"
+          className={`
+            flex 
+            flex-col 
+            gap-4
+            ${
+              isInPreviewMode
+                ? "md:flex-row justify-between"
+                : "md:grid grid-cols-3"
+            } 
+            items-center 
+            px-4
+            `}
         >
-          <div id="header-title-box">
-            {!isEditingTitle ? (
-              <>
-                <h1
-                  id="title"
-                  onClick={() => {
-                    setIsEditingTitle(true);
-                    setTitleError(null);
-                  }}
-                  className="cursor-pointer leading-tight max-w-72"
-                >
-                  {displayTitle}
-                </h1>
-              </>
-            ) : (
-              <UploadSiteInfoForm
-                getToken={getToken}
-                setIsEditingTitle={setIsEditingTitle}
-                onOptimisticUpdate={setDisplayTitle}
-                onError={(msg) => {
-                  setDisplayTitle(siteInfo.title);
-                  setTitleError(msg);
-                }}
-              />
-            )}
-            {titleError && (
-              <p className="text-xs text-red-400 mt-1">{titleError}</p>
-            )}
-          </div>
+          <HeaderTitleBox />
 
-          <div
-            id="header-upload-button-container"
-            className="flex justify-center"
-          >
-            <CustomButton onClick={() => setIsUploadModalOpen(true)}>
-              Upload Artwork
-            </CustomButton>
-          </div>
+          {!isInPreviewMode && (
+            <div
+              id="header-upload-button-container"
+              className="flex justify-center"
+            >
+              <CustomButton onClick={() => setIsUploadModalOpen(true)}>
+                Upload Artwork
+              </CustomButton>
+            </div>
+          )}
 
-          <div
-            id="header-nav-links"
-            className="flex flex-col md:flex-row justify-end items-center gap-1 lg:gap-4 text-xs xl:text-lg text-neutral-400"
-          >
-            {isInPreviewMode ? (
-              <button
-                onClick={() => setIsInPreviewMode(false)}
-                className="hover:text-neutral-300 underline underline-offset-2 text-xs"
-              >
-                Edit Site
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={onOpenSettings}
-                  className="hover:text-neutral-300 hover:underline underline-offset-2"
-                >
-                  {user.user_metadata?.full_name || user.email}
-                </button>
-
-                <button
-                  onClick={handleLogout}
-                  className="hover:text-neutral-300 underline underline-offset-2"
-                >
-                  Sign out
-                </button>
-
-                <button
-                  onClick={() => setIsInPreviewMode(true)}
-                  className="underline underline-offset-2 hover:text-neutral-300"
-                >
-                  Preview Site
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* <div className="col-span-3">
-            {!isEditingTitle && <p>(click to edit title)</p>}
-          </div> */}
+          <HeaderNavLinks />
         </div>
-
-        {/* <svg
-          className="w-full block mt-6"
-          viewBox="0 0 1200 30"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0,15 Q300,0 600,15 Q900,30 1200,15 L1200,30 L0,30 Z"
-            fill="black"
-          />
-        </svg> */}
 
         {isUploadModalOpen && (
           <Modal onClose={() => setIsUploadModalOpen(false)}>
@@ -171,6 +164,6 @@ export default function AdminHeader({
           </Modal>
         )}
       </SiteHeader>
-    </>
+    </div>
   );
 }
