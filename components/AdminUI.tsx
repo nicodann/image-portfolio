@@ -158,7 +158,7 @@ export default function AdminUI({
 
       {settingsOpen && (
         <Modal onClose={() => setSettingsOpen(false)}>
-          <div className="bg-neutral-900 rounded-sm p-8 max-w-lg w-full bg-purple-800">
+          <div className="bg-neutral-900 rounded-sm p-8 max-w-lg w-full ">
             <h2 className="text-sm uppercase tracking-widest text-neutral-400 mb-8">
               Settings
             </h2>

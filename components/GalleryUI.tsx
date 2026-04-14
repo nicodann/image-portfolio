@@ -11,7 +11,9 @@ export default function GalleryUI({
 }) {
   return (
     <main className="min-h-screen p-4 sm:p-6 lg:p-8">
-      <SiteHeader siteInfo={siteInfo} />
+      <SiteHeader>
+        <h1>{siteInfo.title}</h1>
+      </SiteHeader>
       <MasonryGrid artwork={artwork} />
     </main>
   );

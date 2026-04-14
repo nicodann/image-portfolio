@@ -1,9 +1,13 @@
-import { SiteInfo } from "@/types/types";
-
-export default function SiteHeader({ siteInfo }: { siteInfo: SiteInfo }) {
+export default function SiteHeader({
+  children,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLElement>) {
   return (
-    <header className="py-8">
-      <h1>{siteInfo.title}</h1>
+    <header
+      className={`py-8 h-[112px] overflow-hidden ${className && className}`}
+    >
+      {children}
     </header>
   );
 }
