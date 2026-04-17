@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@dnd-kit/react": "^0.4.0",
     "busboy": "^1.6.0",
     "cloudinary": "^2.5.1",
     "next": "^16.2.2",
     "react": "^19",
     "react-dom": "^19",
+    "react-masonry-css": "^1.0.16",
     "sharp": "^0.33.5"
   },
   "devDependencies": {

@@ -23,9 +23,46 @@ export default function AdminUI({
   const [isDeleting, setIsDeleting] = useState(false);
   const [pendingEdit, setPendingEdit] = useState<Artwork | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [orderDirty, setOrderDirty] = useState(false);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
 
   function getToken(): string | null {
     return window.netlifyIdentity.currentUser()?.token?.access_token ?? null;
+  }
+
+  function handleApiResponse(res: Response) {
+    if (res.status === 401) {
+      setAutoLoggedOut(true);
+      window.netlifyIdentity.logout();
+      return false;
+    }
+    return true;
+  }
+
+  function handleReorder(reordered: Artwork[]) {
+    setArtworkList(reordered);
+    setOrderDirty(true);
+  }
+
+  async function saveOrder() {
+    const token = getToken();
+    if (!token) return;
+    setIsSavingOrder(true);
+    const res = await fetch("/.netlify/functions/reorder-artwork", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids: artworkList.map((a) => a.id) }),
+    });
+    setIsSavingOrder(false);
+    if (!handleApiResponse(res)) return;
+    if (res.ok) {
+      setOrderDirty(false);
+    } else {
+      alert("Failed to save order");
+    }
   }
 
   function handleEditSuccess(updated: Artwork) {
@@ -55,6 +92,7 @@ export default function AdminUI({
     });
     setIsDeleting(false);
 
+    if (!handleApiResponse(res)) return;
     if (res.ok) {
       setArtworkList((prev) => prev.filter((a) => a.id !== pendingDelete.id));
       setPendingDelete(null);
@@ -74,8 +112,14 @@ export default function AdminUI({
 
       if (Date.now() >= expiresAt - fiveMinutes) {
         try {
-          const refreshed = await window.netlifyIdentity.refresh(true);
-          setUser(refreshed as NetlifyUser);
+          const refreshed = (await window.netlifyIdentity.refresh(
+            true,
+          )) as NetlifyUser;
+          const newExpiry = refreshed?.token?.expires_at ?? 0;
+          if (newExpiry * 1000 <= Date.now()) {
+            throw new Error("Token still expired after refresh");
+          }
+          setUser(refreshed);
         } catch {
           setAutoLoggedOut(true);
           window.netlifyIdentity.logout();
@@ -149,11 +193,14 @@ export default function AdminUI({
         user={user}
         onOpenSettings={() => setSettingsOpen(true)}
         onArtworkUploaded={(a) => setArtworkList((prev) => [a, ...prev])}
+        onSaveOrder={orderDirty ? saveOrder : undefined}
+        isSavingOrder={isSavingOrder}
       />
       <MasonryGrid
         artwork={artworkList}
         onDelete={setPendingDelete}
         onEdit={setPendingEdit}
+        onReorder={handleReorder}
       />
 
       {settingsOpen && (

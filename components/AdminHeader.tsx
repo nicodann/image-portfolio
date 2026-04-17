@@ -2,10 +2,9 @@
 
 import { SiteInfo, NetlifyUser, Artwork } from "@/types/types";
 import UploadSiteInfoForm from "./UploadSiteInfoForm";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import UploadImageForm from "./UploadImageForm";
 import Modal from "./Modal";
-import Link from "next/link";
 import CustomButton from "./CustomButton";
 import SiteHeader from "./SiteHeader";
 
@@ -14,11 +13,15 @@ export default function AdminHeader({
   user,
   onOpenSettings,
   onArtworkUploaded,
+  onSaveOrder,
+  isSavingOrder,
 }: {
   siteInfo: SiteInfo;
   user: NetlifyUser;
   onOpenSettings: () => void;
   onArtworkUploaded: (artwork: Artwork) => void;
+  onSaveOrder?: () => void;
+  isSavingOrder?: boolean;
 }) {
   const [displayTitle, setDisplayTitle] = useState(siteInfo.title);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -137,11 +140,16 @@ export default function AdminHeader({
           {!isInPreviewMode && (
             <div
               id="header-upload-button-container"
-              className="flex justify-center"
+              className="flex flex-col md:flex-row justify-center gap-3 flex-wrap"
             >
               <CustomButton onClick={() => setIsUploadModalOpen(true)}>
                 Upload Artwork
               </CustomButton>
+              {onSaveOrder && (
+                <CustomButton onClick={onSaveOrder} disabled={isSavingOrder}>
+                  {isSavingOrder ? "Saving…" : "Save Order"}
+                </CustomButton>
+              )}
             </div>
           )}
 
