@@ -46,8 +46,11 @@ export default function AdminUI({
 
   async function saveOrder() {
     const token = getToken();
+
     if (!token) return;
+
     setIsSavingOrder(true);
+
     const res = await fetch("/.netlify/functions/reorder-artwork", {
       method: "POST",
       headers: {
@@ -56,8 +59,11 @@ export default function AdminUI({
       },
       body: JSON.stringify({ ids: artworkList.map((a) => a.id) }),
     });
+
     setIsSavingOrder(false);
+
     if (!handleApiResponse(res)) return;
+
     if (res.ok) {
       setOrderDirty(false);
     } else {
@@ -74,11 +80,13 @@ export default function AdminUI({
 
   async function confirmDelete() {
     if (!pendingDelete) return;
+
     const token =
       window.netlifyIdentity.currentUser()?.token?.access_token ?? null;
     if (!token) return;
 
     setIsDeleting(true);
+
     const res = await fetch("/.netlify/functions/delete-artwork", {
       method: "DELETE",
       headers: {
@@ -90,9 +98,11 @@ export default function AdminUI({
         imageUrl: pendingDelete.imageUrl,
       }),
     });
+
     setIsDeleting(false);
 
     if (!handleApiResponse(res)) return;
+
     if (res.ok) {
       setArtworkList((prev) => prev.filter((a) => a.id !== pendingDelete.id));
       setPendingDelete(null);
@@ -105,9 +115,11 @@ export default function AdminUI({
   useEffect(() => {
     async function checkToken() {
       const u = window.netlifyIdentity.currentUser();
+
       if (!u?.token?.expires_at) return;
 
       const expiresAt = u.token.expires_at * 1000;
+
       const fiveMinutes = 5 * 60 * 1000;
 
       if (Date.now() >= expiresAt - fiveMinutes) {
@@ -115,10 +127,13 @@ export default function AdminUI({
           const refreshed = (await window.netlifyIdentity.refresh(
             true,
           )) as NetlifyUser;
+
           const newExpiry = refreshed?.token?.expires_at ?? 0;
+
           if (newExpiry * 1000 <= Date.now()) {
             throw new Error("Token still expired after refresh");
           }
+
           setUser(refreshed);
         } catch {
           setAutoLoggedOut(true);
@@ -129,15 +144,21 @@ export default function AdminUI({
 
     async function init() {
       const ni = window.netlifyIdentity;
+
       ni.init();
+
       setUser(ni.currentUser() ?? null);
+
       setReady(true);
+
       await checkToken();
+
       ni.on("login", (user) => {
         setUser(user ?? null);
         setAutoLoggedOut(false);
         ni.close();
       });
+
       ni.on("logout", () => setUser(null));
     }
 
@@ -154,6 +175,7 @@ export default function AdminUI({
     }
 
     const tokenInterval = setInterval(checkToken, 60_000);
+
     return () => clearInterval(tokenInterval);
   }, []);
 
