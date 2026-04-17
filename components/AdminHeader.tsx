@@ -49,7 +49,7 @@ export default function AdminHeader({
             setIsEditingTitle(true);
             setTitleError(null);
           }}
-          className="cursor-pointer leading-tight max-w-72"
+          className="cursor-pointer hover:underline leading-tight max-w-72"
         >
           {displayTitle}
         </h1>
@@ -71,7 +71,7 @@ export default function AdminHeader({
   const HeaderNavLinks = () => (
     <div
       id="header-nav-links"
-      className="flex flex-col md:flex-row justify-end items-center gap-1 lg:gap-4 text-xs xl:text-lg text-neutral-400"
+      className="flex flex-col md:flex-row justify-end items-center gap-1 lg:gap-4 text-xs xl:text-sm text-neutral-400"
     >
       {isInPreviewMode ? (
         <button
