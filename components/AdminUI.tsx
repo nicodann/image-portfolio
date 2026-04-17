@@ -113,29 +113,31 @@ export default function AdminUI({
   }
 
   useEffect(() => {
-    async function checkToken() {
-      const u = window.netlifyIdentity.currentUser();
+    let tokenInterval: ReturnType<typeof setInterval>;
 
+    async function checkToken() {
+      const u = window.netlifyIdentity.currentUser() as NetlifyUser | null;
       if (!u?.token?.expires_at) return;
 
       const expiresAt = u.token.expires_at * 1000;
-
       const fiveMinutes = 5 * 60 * 1000;
+      const msLeft = expiresAt - Date.now();
+      // console.log("[checkToken] expires_at:", u.token.expires_at, "| ms until expiry:", msLeft, "| will refresh:", msLeft <= fiveMinutes);
 
       if (Date.now() >= expiresAt - fiveMinutes) {
         try {
+          // console.log("[checkToken] refreshing token...");
           const refreshed = (await window.netlifyIdentity.refresh(
             true,
           )) as NetlifyUser;
-
           const newExpiry = refreshed?.token?.expires_at ?? 0;
-
+          // console.log("[checkToken] refresh result expires_at:", newExpiry);
           if (newExpiry * 1000 <= Date.now()) {
             throw new Error("Token still expired after refresh");
           }
-
           setUser(refreshed);
-        } catch {
+        } catch (err) {
+          console.error("[checkToken] refresh failed, logging out:", err);
           setAutoLoggedOut(true);
           window.netlifyIdentity.logout();
         }
@@ -144,37 +146,44 @@ export default function AdminUI({
 
     async function init() {
       const ni = window.netlifyIdentity;
-
       ni.init();
 
-      setUser(ni.currentUser() ?? null);
-
+      const currentUser = ni.currentUser() as NetlifyUser | null;
+      setUser(currentUser);
       setReady(true);
 
-      await checkToken();
-
       ni.on("login", (user) => {
-        setUser(user ?? null);
+        const u = user as NetlifyUser;
+        // console.log("[netlifyIdentity] login event, expires_at:", u?.token?.expires_at);
+        setUser(u);
         setAutoLoggedOut(false);
         ni.close();
       });
 
-      ni.on("logout", () => setUser(null));
+      ni.on("logout", () => {
+        console.log("[netlifyIdentity] logout event");
+        setUser(null);
+      });
+
+      await checkToken();
+
+      tokenInterval = setInterval(checkToken, 1_000);
     }
 
     if (window.netlifyIdentity) {
       init();
     } else {
-      const interval = setInterval(() => {
+      const pollingInterval = setInterval(() => {
         if (window.netlifyIdentity) {
-          clearInterval(interval);
+          clearInterval(pollingInterval);
           init();
         }
       }, 50);
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(pollingInterval);
+        clearInterval(tokenInterval);
+      };
     }
-
-    const tokenInterval = setInterval(checkToken, 60_000);
 
     return () => clearInterval(tokenInterval);
   }, []);

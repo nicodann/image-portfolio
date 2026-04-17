@@ -105,7 +105,7 @@ export default function MasonryGrid({
         className="flex gap-4 px-4 pt-4"
         columnClassName="flex flex-col gap-4"
       >
-        {artwork.map((item) => (
+        {artwork.map((item, index) => (
           <DraggableCard
             key={item.id}
             id={item.id}
@@ -124,6 +124,7 @@ export default function MasonryGrid({
                   height={600}
                   className="w-full h-auto object-cover transition-opacity duration-300 group-hover:opacity-80"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  priority={index < 4}
                 />
               </div>
               <div className="pt-2 pb-1">
