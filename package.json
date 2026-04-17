@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@dnd-kit/react": "^0.4.0",
     "busboy": "^1.6.0",
     "cloudinary": "^2.5.1",
     "next": "^16.2.2",
